@@ -331,6 +331,74 @@ void run_mode(int mode)
   }
 }
 
+void set_time(){
+  int temp_hour = hours;
+  while (true) {
+    display.clearDisplay();
+    print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
+
+    int pressed = wait_for_button_press();
+    if (pressed == PB_UP) {
+      delay (200);
+      temp_hour += 1;
+      temp_hour = temp_hour % 24;
+    }
+
+    else if (pressed == PB_DOWN) {
+      delay (200);
+      temp_hour -= 1;
+      if (temp_hour < 0) {
+        temp_hour = 23;
+      }
+    }
+    else if (pressed == PB_OK) {
+      delay(200);
+      hours = temp_hour;
+      break;
+    }
+    else if (pressed == PB_CANCEL) {
+      delay(200);
+      break;
+    }
+  }
+
+  int temp_minute = minutes;
+  while (true) {
+    display.clearDisplay();
+    print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
+
+    int pressed = wait_for_button_press();
+    if (pressed == PB_UP) {
+      delay(200);
+      temp_minute += 1;
+      temp_minute = temp_minute ⅞ 60;
+    }
+
+    else if (pressed == PB_DOWN) {
+      delay(200);
+      temp_minute -= 1;
+      if (temp_minute < 0) {
+        temp_minute = 59;
+      }
+    }
+
+    else if (pressed == PB_0K) {
+      delay(200);
+      minutes = temp_minute;
+      break;
+    }
+
+    else if (pressed == PB_CANCEL) {
+      delay(200);
+      break;
+    }
+  }
+
+  display.clearDisplay();
+  print_line("Time is set", 0, 0, 2);
+  delay(1000);
+}
+
 void set_alarm(int alarm)
 {
 
@@ -448,19 +516,19 @@ void check_temp(void)
   }
 }
 
-void connet_wifi(ssid, password)
-{
-  Serial.printf("Connecting to %s ", ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println(" CONNECTED");
-}
+// void connet_wifi(ssid, password)
+// {
+//   Serial.printf("Connecting to %s ", ssid);
+//   WiFi.begin(ssid, password);
+//   while (WiFi.status() != WL_CONNECTED)
+//   {
+//     delay(500);
+//     Serial.print(".");
+//   }
+//   Serial.println(" CONNECTED");
+// }
 
-void timeavailable(struct timeval *t)
+// void timeavailable(struct timeval *t)
 {
   Serial.println("Got time adjustment from NTP!");
   printLocalTime();
