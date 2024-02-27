@@ -102,16 +102,18 @@ void setup()
   configtime(UTC_OFFSET, UTC_OFFSET_DST, NTP_SERVER);
 }
 
-void loop(){
+void loop()
+{
   // put your main code here, to run repeatedly:
   update_time_with_check_alarm();
-  if(digitalRead(CANCEL) == LOW) {
+  if (digitalRead(CANCEL) == LOW)
+  {
     delay(1000);
     Serial.println("Menu");
     go_to_menu();
-}
+  }
 
-check_temp();
+  check_temp();
 }
 
 // function to print a line of text in a given text size and the given position
@@ -123,18 +125,6 @@ void print_line(String text, int text_size, int row, int column)
   display.println(text);
 
   display.display(); // delay (2000);
-}
-
-// function to display the current time DD:HH:MM:SS
-void print_time_now(void)
-{
-  print_line(String(days), 2, 0, 0);
-  print_line(":", 2, 0, 20);
-  print_line(String(hours), 2, 0, 30);
-  print_line(":", 2, 0, 50);
-  print_line(String(minutes), 2, 0, 60);
-  print_line(":", 2, 0, 80);
-  print_line(String(seconds), 2, 0, 90);
 }
 
 // function to automatically update the current time
@@ -193,8 +183,20 @@ void update_time_wifi(void)
   seconds = atoi(sec_str);
 }
 
+// function to display the current time DD:HH:MM:SS
+void print_time_now(void)
+{
+  print_line(String(days), 2, 0, 0);
+  print_line(":", 2, 0, 20);
+  print_line(String(hours), 2, 0, 30);
+  print_line(":", 2, 0, 50);
+  print_line(String(minutes), 2, 0, 60);
+  print_line(":", 2, 0, 80);
+  print_line(String(seconds), 2, 0, 90);
+}
+
 // function to automatically update the current time while checking for alarms
-void update_time with check _alarm()
+void update_time_with_check_alarm()
 {
   // update time
   display.clearDisplay();
@@ -216,111 +218,213 @@ void update_time with check _alarm()
   }
 }
 
+// ring an alarm
 void ring_alarm()
 {
+  // Show message on display
+  display.clearDisplay();
+  print_line("Medicine Time", 2, 0, 0);
+
+  // light up LED 1
+  digitalWrite(LED_1, HIGH);
+
+  // ring the buzzer
+  while (digitalRead(CANCEL) == HIGH)
+  {
+    for (int i = 0; 1 < n_notes; i++)
+    {
+      if (digitalRead(CANCEL) == LOW)
+      {
+        delay(200);
+        break;
+      }
+      tone(BUZZER, notes[i]);
+      delay(500);
+      noTone(BUZZER);
+      delay(2);
+    }
+  }
+  delay(200);
+  digitalwrite(LED_1, LOW);
 }
 
+// function to wait for button press in the menu
 int wait_for_button_press()
 {
+  while (true)
+  {
+    if (digitalRead(UP) == LOW)
+    {
+      delay(200);
+      return UP;
+    }
+
+    else if (digitalRead(DOWN) == LOW)
+    {
+      delay(200);
+      return DOWN;
+    }
+    else if (digitalRead(CANCEL) == LOW)
+    {
+      delay(200);
+      return CANCEL;
+    }
+    else if (digitalRead(OK) == LOW)
+    {
+      delay(200);
+      return OK;
+    }
+    update_time();
+  }
 }
 
-void go_to_menu()
-{
-}
+// function to navigate through the menu
+void go_to_menu(void){
+  while (digitalread(CANCEL) == HIGH) {
+    display.clearDisplay();
+    print_line(options[current_mode], 2, 0, 0);
+
+    int pressed = wait_for_button_press();
+
+    if (pressed == UP) {
+      current_mode += 1;
+      current_mode %= max_modes;
+      delay (200);
+    }
+
+    else if (pressed == DOWN) {
+      current_mode -= 1;
+      if (current mode < 0) {
+        current_mode = max modes - 1;
+      }
+      delay (200);
+    }
+    
+else if (pressed == 0K) {
+Serial.printIn(current_mode);
+delay(200);
+run mode (current_mode);
+｝
+｝
+｝
 
 void run_mode()
 {
 }
 
-void set_alarm(int alarm){
+void set_alarm(int alarm)
+{
 
   int temp_hour = alarm_hours[alarm];
-  while(true){
+  while (true)
+  {
     display.clearDisplay();
     print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
 
-  int pressed = wait_for_button_press();
-  if (pressed == PB_UP) {
-    delay (200);
-    temp_hour += 1;
-    temp_hour = temp_hour % 24;
-  }
+    int pressed = wait_for_button_press();
+    if (pressed == PB_UP)
+    {
+      delay(200);
+      temp_hour += 1;
+      temp_hour = temp_hour % 24;
+    }
 
-  else if (pressed == PB_DOWN){
-    delay (200);
-    temp_hour -= 1;
-    if (temp_hour < 0) {
-      temp_hour = 23;
+    else if (pressed == PB_DOWN)
+    {
+      delay(200);
+      temp_hour -= 1;
+      if (temp_hour < 0)
+      {
+        temp_hour = 23;
+      }
+    }
+
+    else if (pressed == PB_OK)
+    {
+      delay(200);
+      alarm_hours[alarm] = temp_hour;
+      break;
+    }
+
+    else if (pressed == PB_CANCEL)
+    {
+      delay(200);
+      break;
     }
   }
 
-  else if (pressed == PB_OK){
-    delay(200);
-    alarm_hours[alarm] = temp_hour;
-    break;
-  }
-
-  else if (pressed == PB_CANCEL){
-    delay (200); break;
-  } 
-}
-
-int temp_minute = alarm_minutes[alarm];
-  while (true){
+  int temp_minute = alarm_minutes[alarm];
+  while (true)
+  {
     display.clearDisplay();
-      print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
-int pressed = wait_for_button_press();
-if (pressed == PB_UP) {
-delay(200);
-temp_minute += 1;
-temp_minute = temp_minute % 60;
-}
-else if (pressed == PB_DOWN) {
-delay(200);
-temp_minute -= 1;
-if (temp_minute < 0) {
-temp_minute = 59;
-｝
-}
-else if (pressed == PB_0K) {
-delay(200);
-alarm minutes[alarm] = temp_minute;
-break;
-}
-else if (pressed == PB_CANCEL) {
-delay (200);
-break;
-｝
-}
-display.clearDisplay();
-print_line("Alarm is set", 0, 0, 2);
-delay (1000);
+    print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
+
+    int pressed = wait_for_button_press();
+    if (pressed == PB_UP)
+    {
+      delay(200);
+      temp_minute += 1;
+      temp_minute = temp_minute % 60;
+    }
+
+    else if (pressed == PB_DOWN)
+    {
+      delay(200);
+      temp_minute -= 1;
+      if (temp_minute < 0)
+      {
+        temp_minute = 59;
+      }
+    }
+
+    else if (pressed == PB_0K)
+    {
+      delay(200);
+      alarm_minutes[alarm] = temp_minute;
+      break;
+    }
+
+    else if (pressed == PB_CANCEL)
+    {
+      delay(200);
+      break;
+    }
+  }
+  display.clearDisplay();
+  print_line("Alarm is set", 0, 0, 2);
+  delay(1000);
 }
 
-void check_temp(void){
+void check_temp(void)
+{
   TempAndHumidity data = dhtSensor.getTempAndHumidity();
   bool all_good = true;
-  if(data.temperature > 35){
+  if (data.temperature > 35)
+  {
     all_good = false;
     digitalWrite(LED_2, HIGH);
     print_line("TEMP HIGH", 1, 40, 0);
   }
-  else if(data.temperature < 25){
+  else if (data.temperature < 25)
+  {
     all_good = false;
     digitalWrite(LED_2, HIGH);
     print_line("TEMP LOW", 1, 40, 0);
   }
-  if (data.humidity > 85){
+  if (data.humidity > 85)
+  {
     all_good = false;
     digitalWrite(LED 2, HIGH);
     print_line("HUMD HIGH", 1, 50, 0);
   }
-  else if (data.humidity < 35){
+  else if (data.humidity < 35)
+  {
     all_good = false;
     digitalWrite(LED_2, HIGH);
     print_line("HUMD LOW", 1, 50, 0);
   }
-  if (all_good) {
+  if (all_good)
+  {
     digitalwrite(LED_2, LOW);
   }
 }
