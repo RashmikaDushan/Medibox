@@ -27,7 +27,7 @@
 
 // object Declarations
 Adafruit_SSD1306 display(SCREEN_HEIGHT, SCREEN_HEIGHT, &Wire, OLED_RESET);
-DHTesp dhtsensor;
+DHTesp dhtSensor;
 
 // Variables
 int n_notes = 8;
@@ -76,7 +76,7 @@ void setup()
   // put your setup code here, to run once:
   if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
   {
-    Serial.printIn(F("SSD1306 allocation failed"));
+    Serial.println(F("SSD1306 allocation failed"));
     for (;;)
       ; // Don't proceed, loop forever
   }
@@ -89,7 +89,7 @@ void setup()
   print_line("Welcome to Medibox", 2, 0, 0); // (String, text_size, cursor_row, cursor_column)
   delay(3000);
 
-  Wifi.begin("Wokwi-GUEST", "", 6);
+  WiFi.begin("Wokwi-GUEST", "", 6);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(250);
@@ -99,7 +99,7 @@ void setup()
   display.clearDisplay();
   print_line("Connected to WiF!", 2, 0, 0);
 
-  configtime(UTC_OFFSET, UTC_OFFSET_DST, NTP_SERVER);
+  configTime(UTC_OFFSET, UTC_OFFSET_DST, NTP_SERVER);
 }
 
 void loop()
@@ -121,7 +121,7 @@ void print_line(String text, int text_size, int row, int column)
 {
   display.setTextSize(text_size);      // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setcursor(column, row);      // Start at (row, column)
+  display.setCursor(column, row);      // Start at (row, column)
   display.println(text);
 
   display.display(); // delay (2000);
@@ -154,7 +154,7 @@ void update_time(void)
     days += 1;
 
     // enable the alarms again
-    for (int i = 0; i < nalarms; i++)
+    for (int i = 0; i < n_alarms; i++)
     {
       alarm_triggered[i] = false;
     }
@@ -245,7 +245,7 @@ void ring_alarm()
     }
   }
   delay(200);
-  digitalwrite(LED_1, LOW);
+  digitalWrite(LED_1, LOW);
 }
 
 // function to wait for button press in the menu
@@ -281,7 +281,7 @@ int wait_for_button_press()
 // function to navigate through the menu
 void go_to_menu(void)
 {
-  while (digitalread(CANCEL) == HIGH)
+  while (digitalRead(CANCEL) == HIGH)
   {
     display.clearDisplay();
     print_line(options[current_mode], 2, 0, 0);
@@ -298,14 +298,14 @@ void go_to_menu(void)
     else if (pressed == DOWN)
     {
       current_mode -= 1;
-      if (current mode < 0)
+      if(current_mode < 0)
       {
-        current_mode = max modes - 1;
+        current_mode = max_modes - 1;
       }
       delay(200);
     }
 
-    else if (pressed == 0K)
+    else if (pressed == OK)
     {
       Serial.println(current_mode);
       delay(200);
@@ -338,25 +338,25 @@ void set_time(){
     print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
 
     int pressed = wait_for_button_press();
-    if (pressed == PB_UP) {
+    if (pressed == UP) {
       delay (200);
       temp_hour += 1;
       temp_hour = temp_hour % 24;
     }
 
-    else if (pressed == PB_DOWN) {
+    else if (pressed == DOWN) {
       delay (200);
       temp_hour -= 1;
       if (temp_hour < 0) {
         temp_hour = 23;
       }
     }
-    else if (pressed == PB_OK) {
+    else if (pressed == OK) {
       delay(200);
       hours = temp_hour;
       break;
     }
-    else if (pressed == PB_CANCEL) {
+    else if (pressed == CANCEL) {
       delay(200);
       break;
     }
@@ -368,13 +368,13 @@ void set_time(){
     print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
 
     int pressed = wait_for_button_press();
-    if (pressed == PB_UP) {
+    if (pressed == UP) {
       delay(200);
       temp_minute += 1;
-      temp_minute = temp_minute ⅞ 60;
+      temp_minute = temp_minute % 60;
     }
 
-    else if (pressed == PB_DOWN) {
+    else if (pressed == DOWN) {
       delay(200);
       temp_minute -= 1;
       if (temp_minute < 0) {
@@ -382,13 +382,13 @@ void set_time(){
       }
     }
 
-    else if (pressed == PB_0K) {
+    else if (pressed == OK) {
       delay(200);
       minutes = temp_minute;
       break;
     }
 
-    else if (pressed == PB_CANCEL) {
+    else if (pressed == CANCEL) {
       delay(200);
       break;
     }
@@ -409,14 +409,14 @@ void set_alarm(int alarm)
     print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
 
     int pressed = wait_for_button_press();
-    if (pressed == PB_UP)
+    if (pressed == UP)
     {
       delay(200);
       temp_hour += 1;
       temp_hour = temp_hour % 24;
     }
 
-    else if (pressed == PB_DOWN)
+    else if (pressed == DOWN)
     {
       delay(200);
       temp_hour -= 1;
@@ -426,14 +426,14 @@ void set_alarm(int alarm)
       }
     }
 
-    else if (pressed == PB_OK)
+    else if (pressed == OK)
     {
       delay(200);
       alarm_hours[alarm] = temp_hour;
       break;
     }
 
-    else if (pressed == PB_CANCEL)
+    else if (pressed == CANCEL)
     {
       delay(200);
       break;
@@ -447,14 +447,14 @@ void set_alarm(int alarm)
     print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
 
     int pressed = wait_for_button_press();
-    if (pressed == PB_UP)
+    if (pressed == UP)
     {
       delay(200);
       temp_minute += 1;
       temp_minute = temp_minute % 60;
     }
 
-    else if (pressed == PB_DOWN)
+    else if (pressed == DOWN)
     {
       delay(200);
       temp_minute -= 1;
@@ -464,14 +464,14 @@ void set_alarm(int alarm)
       }
     }
 
-    else if (pressed == PB_0K)
+    else if (pressed == OK)
     {
       delay(200);
       alarm_minutes[alarm] = temp_minute;
       break;
     }
 
-    else if (pressed == PB_CANCEL)
+    else if (pressed == CANCEL)
     {
       delay(200);
       break;
@@ -501,7 +501,7 @@ void check_temp(void)
   if (data.humidity > 85)
   {
     all_good = false;
-    digitalWrite(LED 2, HIGH);
+    digitalWrite(LED_2, HIGH);
     print_line("HUMD HIGH", 1, 50, 0);
   }
   else if (data.humidity < 35)
@@ -512,7 +512,7 @@ void check_temp(void)
   }
   if (all_good)
   {
-    digitalwrite(LED_2, LOW);
+    digitalWrite(LED_2, LOW);
   }
 }
 
@@ -529,7 +529,7 @@ void check_temp(void)
 // }
 
 // void timeavailable(struct timeval *t)
-{
-  Serial.println("Got time adjustment from NTP!");
-  printLocalTime();
-}
+// {
+//   Serial.println("Got time adjustment from NTP!");
+//   printLocalTime();
+// }
