@@ -279,37 +279,56 @@ int wait_for_button_press()
 }
 
 // function to navigate through the menu
-void go_to_menu(void){
-  while (digitalread(CANCEL) == HIGH) {
+void go_to_menu(void)
+{
+  while (digitalread(CANCEL) == HIGH)
+  {
     display.clearDisplay();
     print_line(options[current_mode], 2, 0, 0);
 
     int pressed = wait_for_button_press();
 
-    if (pressed == UP) {
+    if (pressed == UP)
+    {
       current_mode += 1;
       current_mode %= max_modes;
-      delay (200);
+      delay(200);
     }
 
-    else if (pressed == DOWN) {
+    else if (pressed == DOWN)
+    {
       current_mode -= 1;
-      if (current mode < 0) {
+      if (current mode < 0)
+      {
         current_mode = max modes - 1;
       }
-      delay (200);
+      delay(200);
     }
-    
-else if (pressed == 0K) {
-Serial.printIn(current_mode);
-delay(200);
-run mode (current_mode);
-｝
-｝
-｝
 
-void run_mode()
+    else if (pressed == 0K)
+    {
+      Serial.println(current_mode);
+      delay(200);
+      run_mode(current_mode);
+    }
+  }
+}
+
+void run_mode(int mode)
 {
+  if (mode == 0)
+  {
+    set_time();
+  }
+  else if (mode == 1 || mode == 2)
+  {
+    set_alarm(mode - 1);
+  }
+
+  else if (mode == 3)
+  {
+    alarm_enabled = false;
+  }
 }
 
 void set_alarm(int alarm)
